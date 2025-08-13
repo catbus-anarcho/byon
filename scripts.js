@@ -52,19 +52,69 @@ function upvote(id) {
   }
 }
 
-// Connect wallet simulation
-function connectWallet() {
+/**
+ * Connect to the user's Xverse wallet via the open‑source Sats Connect API.
+ *
+ * When the library is available (either via a global `satsConnect` object or
+ * `SatsConnect`), this function will request the user to connect and then
+ * display the connected ordinals address. If the library fails to load or the
+ * user rejects the request, a message will be displayed instead. See the
+ * official Xverse documentation for more details on the `wallet_connect`
+ * method【8147329001946†L100-L118】【8147329001946†L158-L181】.
+ */
+async function connectXverse() {
   const statusEl = document.getElementById('walletStatus');
   const button = document.getElementById('connectBtn');
   if (!statusEl || !button) return;
-  // Simulate connection delay
   statusEl.textContent = 'Connecting…';
   button.disabled = true;
-  setTimeout(() => {
-    statusEl.textContent = 'Connected (mock) – membership verified!';
-    button.textContent = 'Connected';
-    button.disabled = true;
-  }, 1000);
+  try {
+    let requestFunc;
+    // Determine which namespace the request function lives under.
+    if (window.satsConnect && typeof window.satsConnect.request === 'function') {
+      requestFunc = window.satsConnect.request;
+    } else if (window.SatsConnect && typeof window.SatsConnect.request === 'function') {
+      requestFunc = window.SatsConnect.request;
+    } else {
+      // Dynamically import the module as a fallback. This import uses the UMD
+      // build from jsDelivr. In a production build you may bundle the package
+      // locally.
+      const module = await import('https://cdn.jsdelivr.net/npm/@sats-connect/core@latest/dist/index.umd.js');
+      requestFunc = module.request;
+    }
+    // Request ordinals and payment addresses. The message appears in the
+    // connection prompt, and the network is set to mainnet by default【8147329001946†L100-L118】.
+    const response = await requestFunc('wallet_connect', {
+      addresses: ['ordinals', 'payment'],
+      message: 'Connect to anarcho‑catbus to launch your runes!',
+      network: 'Mainnet',
+    });
+    if (response && response.status === 'success') {
+      const ordinalsItem = response.result.addresses.find(
+        (addr) => addr.purpose === 'ordinals'
+      );
+      const paymentItem = response.result.addresses.find(
+        (addr) => addr.purpose === 'payment'
+      );
+      const ordAddr = ordinalsItem ? ordinalsItem.address : '(no ordinals address)';
+      statusEl.textContent = `Connected to Xverse – ordinals: ${ordAddr}`;
+      button.textContent = 'Connected';
+      // Store addresses on the global object for later use (e.g. minting or voting)
+      window.connectedAddresses = {
+        ordinals: ordinalsItem,
+        payment: paymentItem,
+      };
+    } else {
+      statusEl.textContent = 'Connection rejected or failed. Please try again.';
+      button.disabled = false;
+    }
+  } catch (err) {
+    // Display any error message returned from the wallet
+    statusEl.textContent = err && err.error && err.error.message
+      ? err.error.message
+      : 'Error connecting to wallet';
+    button.disabled = false;
+  }
 }
 
 // Submit a new proposal
@@ -95,6 +145,114 @@ document.addEventListener('DOMContentLoaded', () => {
   renderProposals();
   const connectBtn = document.getElementById('connectBtn');
   if (connectBtn) {
-    connectBtn.addEventListener('click', connectWallet);
+    // When the BYON page is loaded, clicking the connect button will invoke
+    // the Xverse wallet connection flow.
+    connectBtn.addEventListener('click', () => {
+      // Avoid duplicate connections on subsequent clicks
+      if (!connectBtn.disabled) {
+        connectXverse();
+      }
+    });
+  }
+
+  // Toggle mint/etch form fields based on action selection
+  const runeActionSelect = document.getElementById('runeAction');
+  const mintFields = document.getElementById('mintFields');
+  const etchFields = document.getElementById('etchFields');
+  if (runeActionSelect && mintFields && etchFields) {
+    // Initialize visibility on page load
+    mintFields.style.display = runeActionSelect.value === 'mint' ? 'block' : 'none';
+    etchFields.style.display = runeActionSelect.value === 'etch' ? 'block' : 'none';
+    runeActionSelect.addEventListener('change', (e) => {
+      const val = e.target.value;
+      mintFields.style.display = val === 'mint' ? 'block' : 'none';
+      etchFields.style.display = val === 'etch' ? 'block' : 'none';
+    });
   }
 });
+
+/**
+ * Handle a Runes mint or etch order submission. Reads form inputs
+ * from the mint/etch section and calls the appropriate Sats Connect
+ * method (`runes_mint` or `runes_etch`). See the Sats Connect docs for
+ * parameter details【267343010589726†L96-L169】【460235423960652†L96-L146】.
+ */
+async function handleRuneOrder() {
+  const statusEl = document.getElementById('mintEtchStatus');
+  if (!statusEl) return;
+  statusEl.textContent = 'Processing…';
+  // Ensure wallet is connected
+  if (!window.connectedAddresses || !window.connectedAddresses.ordinals || !window.connectedAddresses.payment) {
+    statusEl.textContent = 'Please connect your wallet first.';
+    return;
+  }
+  try {
+    let requestFunc;
+    // Determine which namespace the request function lives under
+    if (window.satsConnect && typeof window.satsConnect.request === 'function') {
+      requestFunc = window.satsConnect.request;
+    } else if (window.SatsConnect && typeof window.SatsConnect.request === 'function') {
+      requestFunc = window.SatsConnect.request;
+    } else {
+      const module = await import('https://cdn.jsdelivr.net/npm/@sats-connect/core@latest/dist/index.umd.js');
+      requestFunc = module.request;
+    }
+    const action = document.getElementById('runeAction').value;
+    const runeName = document.getElementById('runeName').value.trim();
+    if (!runeName) {
+      statusEl.textContent = 'Please provide a rune name.';
+      return;
+    }
+    if (action === 'mint') {
+      // Gather mint parameters
+      const repeats = parseInt(document.getElementById('runeRepeats').value) || 1;
+      const feeRate = parseInt(document.getElementById('runeFeeRate').value) || 1;
+      const ordAddr = window.connectedAddresses.ordinals.address;
+      const payAddr = window.connectedAddresses.payment.address;
+      const response = await requestFunc('runes_mint', {
+        destinationAddress: ordAddr,
+        feeRate: +feeRate,
+        repeats: +repeats,
+        runeName: runeName,
+        refundAddress: payAddr,
+        network: 'Mainnet',
+      });
+      if (response && response.status === 'success') {
+        statusEl.textContent = `Mint order created. Funding transaction id: ${response.result.fundTransactionId}`;
+      } else {
+        statusEl.textContent = response && response.error && response.error.message ? response.error.message : 'Mint failed.';
+      }
+    } else {
+      // Gather etch parameters
+      const divisibility = parseInt(document.getElementById('runeDivisibility').value) || 0;
+      const symbol = document.getElementById('runeSymbol').value || '¤';
+      const premine = document.getElementById('runePremine').value || '0';
+      const isMintable = document.getElementById('runeIsMintable').value === 'true';
+      const amount = document.getElementById('runeAmount').value;
+      const cap = document.getElementById('runeCap').value;
+      // Build terms only if amount or cap provided
+      const terms = {};
+      if (amount) terms.amount = amount;
+      if (cap) terms.cap = cap;
+      const params = {
+        runeName: runeName,
+        divisibility: divisibility,
+        symbol: symbol,
+        premine: premine,
+        isMintable: isMintable,
+        network: 'Mainnet',
+      };
+      if (Object.keys(terms).length) {
+        params.terms = terms;
+      }
+      const response = await requestFunc('runes_etch', params);
+      if (response && response.status === 'success') {
+        statusEl.textContent = `Etch order created. Transaction id: ${response.result.fundTransactionId || response.result.orderId || 'n/a'}`;
+      } else {
+        statusEl.textContent = response && response.error && response.error.message ? response.error.message : 'Etch failed.';
+      }
+    }
+  } catch (err) {
+    statusEl.textContent = err && err.error && err.error.message ? err.error.message : 'Unexpected error.';
+  }
+}
