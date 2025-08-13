@@ -52,69 +52,19 @@ function upvote(id) {
   }
 }
 
-/**
- * Connect to the user's Xverse wallet via the open‑source Sats Connect API.
- *
- * When the library is available (either via a global `satsConnect` object or
- * `SatsConnect`), this function will request the user to connect and then
- * display the connected ordinals address. If the library fails to load or the
- * user rejects the request, a message will be displayed instead. See the
- * official Xverse documentation for more details on the `wallet_connect`
- * method【8147329001946†L100-L118】【8147329001946†L158-L181】.
- */
-async function connectXverse() {
+// Connect wallet simulation
+function connectWallet() {
   const statusEl = document.getElementById('walletStatus');
   const button = document.getElementById('connectBtn');
   if (!statusEl || !button) return;
+  // Simulate connection delay
   statusEl.textContent = 'Connecting…';
   button.disabled = true;
-  try {
-    let requestFunc;
-    // Determine which namespace the request function lives under.
-    if (window.satsConnect && typeof window.satsConnect.request === 'function') {
-      requestFunc = window.satsConnect.request;
-    } else if (window.SatsConnect && typeof window.SatsConnect.request === 'function') {
-      requestFunc = window.SatsConnect.request;
-    } else {
-      // Dynamically import the module as a fallback. This import uses the UMD
-      // build from jsDelivr. In a production build you may bundle the package
-      // locally.
-      const module = await import('https://cdn.jsdelivr.net/npm/@sats-connect/core@latest/dist/index.umd.js');
-      requestFunc = module.request;
-    }
-    // Request ordinals and payment addresses. The message appears in the
-    // connection prompt, and the network is set to mainnet by default【8147329001946†L100-L118】.
-    const response = await requestFunc('wallet_connect', {
-      addresses: ['ordinals', 'payment'],
-      message: 'Connect to anarcho‑catbus to launch your runes!',
-      network: 'Mainnet',
-    });
-    if (response && response.status === 'success') {
-      const ordinalsItem = response.result.addresses.find(
-        (addr) => addr.purpose === 'ordinals'
-      );
-      const paymentItem = response.result.addresses.find(
-        (addr) => addr.purpose === 'payment'
-      );
-      const ordAddr = ordinalsItem ? ordinalsItem.address : '(no ordinals address)';
-      statusEl.textContent = `Connected to Xverse – ordinals: ${ordAddr}`;
-      button.textContent = 'Connected';
-      // Store addresses on the global object for later use (e.g. minting or voting)
-      window.connectedAddresses = {
-        ordinals: ordinalsItem,
-        payment: paymentItem,
-      };
-    } else {
-      statusEl.textContent = 'Connection rejected or failed. Please try again.';
-      button.disabled = false;
-    }
-  } catch (err) {
-    // Display any error message returned from the wallet
-    statusEl.textContent = err && err.error && err.error.message
-      ? err.error.message
-      : 'Error connecting to wallet';
-    button.disabled = false;
-  }
+  setTimeout(() => {
+    statusEl.textContent = 'Connected (mock) – membership verified!';
+    button.textContent = 'Connected';
+    button.disabled = true;
+  }, 1000);
 }
 
 // Submit a new proposal
@@ -145,13 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderProposals();
   const connectBtn = document.getElementById('connectBtn');
   if (connectBtn) {
-    // When the BYON page is loaded, clicking the connect button will invoke
-    // the Xverse wallet connection flow.
-    connectBtn.addEventListener('click', () => {
-      // Avoid duplicate connections on subsequent clicks
-      if (!connectBtn.disabled) {
-        connectXverse();
-      }
-    });
+    connectBtn.addEventListener('click', connectWallet);
   }
 });
