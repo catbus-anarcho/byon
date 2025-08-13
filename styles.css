@@ -1,0 +1,727 @@
+/* Global styles and variables */
+:root {
+  --color-bg: #0e0e0e;
+  --color-bg-light: #181818;
+  --color-text: #f5f5f5;
+  --color-accent: #ff8c42; /* playful orange accent */
+  --color-accent-secondary: #00bcd4; /* complementary teal */
+  --max-width: 1200px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.container {
+  width: 90%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+/* Header */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(14, 14, 14, 0.8);
+  backdrop-filter: blur(6px);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-transform: lowercase;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.logo span {
+  color: var(--color-accent);
+}
+
+.main-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+}
+
+.main-nav a {
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  background-color: #262626;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.1), inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s ease;
+}
+
+.main-nav a:hover {
+  background-color: #333333;
+  color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+/* Highlight for active nav item on the launchpad page */
+.main-nav a.active {
+  color: var(--color-accent);
+  background-color: #333333;
+}
+
+/* Hero section */
+.hero {
+  position: relative;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Launchpad hero overrides */
+.launch-hero .hero-image,
+.launch-image {
+  background-image: url('assets/network.png');
+  filter: brightness(0.45);
+}
+
+/* Wallet connect section */
+.wallet-connect {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.status-message {
+  font-size: 0.9rem;
+  color: #aaaaaa;
+  margin-top: 0.5rem;
+}
+
+/* Form styles */
+.submit-form {
+  max-width: 600px;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group input[type="file"] {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #303030;
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+  outline: 2px solid var(--color-accent);
+}
+
+/* Proposal list */
+.proposal-list {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Video section */
+.video-section h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 ratio */
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Trade section */
+/* Bold styling for guerilla marketing: gradient background, glowing buttons and emphatic tagline */
+.trade-section {
+  position: relative;
+  background: linear-gradient(135deg, #1b263b, #0d131f);
+  padding: 4rem 0 5rem;
+  border-top: 1px solid #2a2a2a;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.trade-section h2 {
+  text-align: center;
+  margin-bottom: 0.75rem;
+  font-size: 2.2rem;
+  color: var(--color-accent);
+}
+
+.trade-tagline {
+  text-align: center;
+  margin-bottom: 0.8rem;
+  color: #bbbbbb;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Additional call-to-action line below the tagline */
+.trade-cta {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--color-accent-secondary);
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Highlighted text inside the trade heading – neon gradient effect */
+.highlighted {
+  background: linear-gradient(90deg, #ff8c42 0%, #ffc176 50%, #ff8c42 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.trade-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.trade-btn {
+  display: inline-block;
+  padding: 0.9rem 2rem;
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  border-radius: 40px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 0 10px rgba(255, 140, 66, 0.5), 0 0 20px rgba(255, 140, 66, 0.3);
+  animation: pulseGlow 2.5s infinite;
+  transition: transform 0.2s ease;
+}
+
+.trade-btn:hover {
+  transform: scale(1.05);
+}
+
+.trade-btn:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.trade-btn:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 140, 66, 0.5), 0 0 20px rgba(255, 140, 66, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(255, 140, 66, 0.8), 0 0 40px rgba(255, 140, 66, 0.5); }
+}
+
+/* Warcry section */
+/* Viking-inspired background for the warcry section */
+.warcry-section {
+  text-align: center;
+  padding: 4rem 0;
+  position: relative;
+  background-image: url('assets/viking-bg.png');
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.warcry-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+.warcry-section .container {
+  position: relative;
+  z-index: 1;
+}
+
+.warcry-quote {
+  font-style: italic;
+  font-size: 1.3rem;
+  margin: 1rem auto 2rem;
+  max-width: 700px;
+  color: #f1f1f1;
+}
+
+.proposal-item {
+  background-color: #262626;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.proposal-item h4 {
+  font-size: 1.1rem;
+  color: var(--color-accent);
+  margin-bottom: 0.25rem;
+}
+
+.proposal-item p {
+  font-size: 0.9rem;
+  color: #cccccc;
+}
+
+.proposal-item button {
+  background-color: var(--color-accent-secondary);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  color: var(--color-bg);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.proposal-item button:hover {
+  background-color: #4fd8e9;
+}
+
+/* Hero image element used on both the home and launch pages */
+.hero-image,
+.launch-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.4);
+}
+
+/* Background images for specific pages */
+.hero-image {
+  background-image: url('assets/hero.png');
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.hero .subtitle {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  color: #cccccc;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 30px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.btn-primary:hover {
+  background-color: #ffb98a;
+  color: var(--color-bg);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* Sections */
+.section-dark {
+  background-color: var(--color-bg-light);
+  padding: 4rem 0;
+}
+
+/* Psyops background for the manifesto section */
+#manifesto.section-dark {
+  position: relative;
+  background-image: url('assets/psyops-bg.png');
+  background-size: cover;
+  background-position: center;
+  animation: backgroundMovePsyops 80s linear infinite;
+  overflow: hidden;
+}
+
+#manifesto.section-dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+#manifesto.section-dark .container {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes backgroundMovePsyops {
+  0% { background-position: 0 0; }
+  100% { background-position: -1000px 0; }
+}
+
+/* BYON page section backgrounds */
+#how.section-dark {
+  position: relative;
+  background-image: url('assets/how-bg.png');
+  background-size: cover;
+  background-position: center;
+  animation: backgroundMoveHow 60s linear infinite;
+  overflow: hidden;
+}
+
+#how.section-dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+#how.section-dark .container {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes backgroundMoveHow {
+  0% { background-position: 0 0; }
+  100% { background-position: 1000px 0; }
+}
+
+#connect.section-light {
+  position: relative;
+  background-image: url('assets/connect-bg.png');
+  background-size: cover;
+  background-position: center;
+  animation: backgroundMoveConnect 60s linear infinite;
+  overflow: hidden;
+}
+
+#connect.section-light::before,
+#submit.section-dark::before,
+#proposals.section-light::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+#connect.section-light .container,
+#submit.section-dark .container,
+#proposals.section-light .container {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes backgroundMoveConnect {
+  0% { background-position: 0 0; }
+  100% { background-position: -1000px 0; }
+}
+
+#submit.section-dark {
+  position: relative;
+  background-image: url('assets/submit-bg.png');
+  background-size: cover;
+  background-position: center;
+  animation: backgroundMoveSubmit 60s linear infinite;
+  overflow: hidden;
+}
+
+@keyframes backgroundMoveSubmit {
+  0% { background-position: 0 0; }
+  100% { background-position: 1000px 0; }
+}
+
+#proposals.section-light {
+  position: relative;
+  background-image: url('assets/proposals-bg.png');
+  background-size: cover;
+  background-position: center;
+  animation: backgroundMoveProposals 60s linear infinite;
+  overflow: hidden;
+}
+
+@keyframes backgroundMoveProposals {
+  0% { background-position: 0 0; }
+  100% { background-position: -1000px 0; }
+}
+
+/* Hover highlight for BYON how it works cards */
+#how .feature-card {
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+#how .feature-card:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--color-accent);
+  background-color: #303030;
+}
+
+/* Optional arrows connecting cards on large screens */
+@media (min-width: 992px) {
+  #how .feature-grid {
+    position: relative;
+  }
+  #how .feature-card {
+    position: relative;
+  }
+  #how .feature-card:not(:last-child)::after {
+    content: '➜';
+    position: absolute;
+    top: 50%;
+    right: -30px;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    color: var(--color-accent);
+  }
+}
+
+.section-light {
+  background-color: #1f1f1f;
+  padding: 4rem 0;
+}
+
+/* Custom background for the features section to evoke an anarchic meme vibe */
+/* This rule overrides the generic section-light style when applied to the features section. */
+#features.section-light {
+  position: relative;
+  background-image: url('assets/meme-bg.png');
+  background-size: cover;
+  background-position: center;
+  animation: backgroundMove 60s linear infinite;
+  padding: 4rem 0;
+  color: var(--color-text);
+  overflow: hidden;
+}
+
+#features.section-light::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+#features.section-light .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Animation for subtle background movement in features section */
+@keyframes backgroundMove {
+  0% { background-position: 0 0; }
+  100% { background-position: 1000px 0; }
+}
+
+/* Glow animation for BYON launchpad button */
+.byon-btn {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 10px var(--color-accent);
+  animation: byonGlow 3s ease-in-out infinite;
+}
+
+@keyframes byonGlow {
+  0% {
+    box-shadow: 0 0 6px var(--color-accent), 0 0 10px var(--color-accent);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--color-accent), 0 0 35px var(--color-accent);
+  }
+  100% {
+    box-shadow: 0 0 6px var(--color-accent), 0 0 10px var(--color-accent);
+  }
+}
+
+.section-dark h2,
+.section-light h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.manifesto-intro {
+  max-width: 700px;
+  margin: 0 auto 2.5rem auto;
+  font-size: 1rem;
+  color: #cccccc;
+  text-align: center;
+}
+
+.manifesto-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.manifesto-item {
+  background-color: #262626;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.manifesto-item h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-accent);
+}
+
+.manifesto-item p {
+  font-size: 0.95rem;
+  color: #dddddd;
+}
+
+/* Features */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.feature-card {
+  background-color: #262626;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+}
+
+.feature-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-accent);
+}
+
+.feature-card p {
+  font-size: 0.95rem;
+  color: #dddddd;
+}
+
+/* Footer */
+.site-footer {
+  background-color: var(--color-bg-light);
+  padding: 2rem 0;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  text-align: center;
+}
+
+.footer-left,
+.footer-right {
+  font-size: 0.85rem;
+  color: #888888;
+}
+
+/* Responsive tweaks */
+@media (min-width: 768px) {
+  .manifesto-items {
+    flex-direction: row;
+  }
+  .footer-content {
+    flex-direction: row;
+    text-align: left;
+  }
+}
