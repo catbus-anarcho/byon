@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>BYON – anarcho•catbus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Header (same as home) -->
+  <header class="site-header">
+    <div class="container header-content">
+      <a href="index.html" class="logo">anarcho<span>•</span>catbus</a>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="index.html#manifesto">Manifesto</a></li>
+          <li><a href="index.html#features">Features</a></li>
+          <li><a href="launchpad.html" class="active">BYON</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Launchpad Hero -->
+  <section class="hero launch-hero">
+    <div class="launch-image"></div>
+    <div class="container hero-content">
+      <h1>BYON</h1>
+      <p class="subtitle">Bring your own node, mint your own collection. A community‑driven ordinals platform with no minting fees.</p>
+      <div class="hero-buttons">
+        <a href="#connect" class="btn btn-primary">Connect wallet</a>
+        <a href="#proposals" class="btn btn-secondary">View proposals</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it Works Section -->
+  <section class="section-dark" id="how">
+    <div class="container">
+      <h2>How it works</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Connect your wallet</h3>
+          <p>Use a Bitcoin Runes wallet like Xverse to connect. Xverse lets you store and send ordinals securely and even works with hardware wallets like Ledger.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Submit a collection</h3>
+          <p>Members can propose new ordinal collections through a simple form. No minting fee is charged – just your creativity on display.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Vote & Launch</h3>
+          <p>Submitted collections are displayed publicly. Community members vote on proposals to decide which collections go live.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Bring your node</h3>
+          <p>When a collection is approved, the creator can connect their own Bitcoin node running ord client. BYON ensures control and decentralisation—users never relinquish custody.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Connect wallet Section -->
+  <section class="section-light" id="connect">
+    <div class="container">
+      <h2>Connect your wallet</h2>
+      <p>To participate in BYON you must prove membership by connecting a compatible wallet. We currently support Xverse. Once connected, a whitelist check will grant access.</p>
+      <div class="wallet-connect">
+        <button id="connectBtn" class="btn btn-primary">Connect Xverse Wallet</button>
+        <p id="walletStatus" class="status-message">Not connected</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Submit collection Section -->
+  <section class="section-dark" id="submit">
+    <div class="container">
+      <h2>Submit a collection</h2>
+      <p>Have an idea for the next meme‑driven ordinal collection? Fill out the form below to propose your project. After submission, your collection will appear in the proposals list for the community to vote on.</p>
+      <form class="submit-form" onsubmit="event.preventDefault(); submitCollection();">
+        <div class="form-group">
+          <label for="collectionName">Collection Name</label>
+          <input type="text" id="collectionName" placeholder="Enter collection name" required />
+        </div>
+        <div class="form-group">
+          <label for="collectionDescription">Description</label>
+          <textarea id="collectionDescription" placeholder="Describe your collection" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="collectionFile">Artwork (optional)</label>
+          <input type="file" id="collectionFile" />
+        </div>
+        <button type="submit" class="btn btn-primary">Submit proposal</button>
+        <p id="submitStatus" class="status-message"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- Proposals Section -->
+  <section class="section-light" id="proposals">
+    <div class="container">
+      <h2>Current proposals</h2>
+      <p>These collections are awaiting your vote. Click the upvote button to support your favourites. Once a collection reaches the launch threshold it will be activated.</p>
+      <div id="proposalList" class="proposal-list">
+        <!-- Proposal items will be injected here by the script -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-left">
+        <p>© 2025 anarcho•catbus. All rights reserved.</p>
+      </div>
+      <div class="footer-right">
+        <p>Not financial advice. Bitcoin calls you to save responsibly.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="scripts.js"></script>
+  <!-- Load the Sats Connect library to interface with Xverse wallets.  -->
+  <!-- When hosted in production, this script will provide a global `satsConnect` object. -->
+  <script src="https://cdn.jsdelivr.net/npm/@sats-connect/core@latest/dist/index.umd.js"></script>
+</body>
+</html>
