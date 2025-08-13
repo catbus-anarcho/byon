@@ -53,66 +53,89 @@ function upvote(id) {
 }
 
 /**
- * Connect to the user's Xverse wallet via the open‑source Sats Connect API.
+ * Open a wallet selector modal and connect the user’s chosen wallet using
+ * Sats Connect. This implementation mirrors the experience found on
+ * books‑on‑bitcoin.com – a modal presents multiple providers (Xverse,
+ * Magic Eden, Unisat, Phantom, etc.) and then uses the selected provider
+ * to request Ordinals and payment addresses via the `wallet_connect` API.
  *
- * When the library is available (either via a global `satsConnect` object or
- * `SatsConnect`), this function will request the user to connect and then
- * display the connected ordinals address. If the library fails to load or the
- * user rejects the request, a message will be displayed instead. See the
- * official Xverse documentation for more details on the `wallet_connect`
- * method【8147329001946†L100-L118】【8147329001946†L158-L181】.
+ * The flow is:
+ *   1. Load the wallet selector custom element by calling `loadSelector()`
+ *      from `@sats-connect/ui`. This registers a `<wallet-provider-selector>`
+ *      element that can display available wallets【626107638998923†L20-L38】.
+ *   2. Fetch installed wallet providers using `getProviders()` from
+ *      `@sats-connect/core`. This returns an array of provider objects
+ *      describing installed wallets【423106552435254†L133-L166】.
+ *   3. Build a default configuration for the selector with
+ *      `makeDefaultProviderConfig(providers)`. This helper ensures Xverse
+ *      always appears at the top and adds install prompts for wallets that
+ *      aren’t installed【635649330978860†L45-L77】.
+ *   4. Call `selectWalletProvider(config)` which opens the modal and
+ *      resolves with the selected provider’s id when the user picks a wallet.
+ *   5. Finally call `request('wallet_connect', …)` with the chosen provider
+ *      to request Ordinals and payment addresses【8147329001946†L100-L118】. The
+ *      addresses are stored on `window.connectedAddresses` for later use.
  */
-async function connectXverse() {
+async function connectWallet() {
   const statusEl = document.getElementById('walletStatus');
   const button = document.getElementById('connectBtn');
   if (!statusEl || !button) return;
   statusEl.textContent = 'Connecting…';
   button.disabled = true;
   try {
-    let requestFunc;
-    // Determine which namespace the request function lives under.
-    if (window.satsConnect && typeof window.satsConnect.request === 'function') {
-      requestFunc = window.satsConnect.request;
-    } else if (window.SatsConnect && typeof window.SatsConnect.request === 'function') {
-      requestFunc = window.SatsConnect.request;
-    } else {
-      // Dynamically import the module as a fallback. This import uses the UMD
-      // build from jsDelivr. In a production build you may bundle the package
-      // locally.
-      const module = await import('https://cdn.jsdelivr.net/npm/@sats-connect/core@latest/dist/index.umd.js');
-      requestFunc = module.request;
+    // Dynamically import the UI, core and configuration helpers. We specify
+    // explicit versions to avoid breaking changes.
+    const uiModule = await import('https://cdn.jsdelivr.net/npm/@sats-connect/ui@0.0.7/dist/index.min.js');
+    const coreModule = await import('https://cdn.jsdelivr.net/npm/@sats-connect/core@2.8.3/dist/index.umd.js');
+    const configModule = await import('https://cdn.jsdelivr.net/npm/@sats-connect/make-default-provider-config@0.0.10/dist/index.min.js');
+    const { loadSelector, selectWalletProvider } = uiModule;
+    const { getProviders, request } = coreModule;
+    const makeDefaultProviderConfig = configModule.makeDefaultProviderConfig || configModule.default;
+    // Register the wallet selector element once. If it’s already loaded it
+    // does nothing【626107638998923†L20-L38】.
+    loadSelector();
+    // Detect installed wallet providers. Some wallets (e.g. Xverse) may be
+    // installed as browser extensions; others will show an install prompt.
+    const providers = await getProviders();
+    // Build the configuration for the selector, ensuring Xverse is always
+    // presented and other wallets are listed according to install state【635649330978860†L45-L77】.
+    const selectorConfig = makeDefaultProviderConfig(providers);
+    // Show the modal and wait for the user to pick a provider. If the user
+    // closes the modal without choosing, a rejected promise is thrown.
+    const selected = await selectWalletProvider(selectorConfig);
+    const providerId = selected && selected.id;
+    if (!providerId) {
+      statusEl.textContent = 'No wallet selected.';
+      button.disabled = false;
+      return;
     }
-    // Request ordinals and payment addresses. The message appears in the
-    // connection prompt, and the network is set to mainnet by default【8147329001946†L100-L118】.
-    const response = await requestFunc('wallet_connect', {
+    // Request Ordinals and payment addresses from the chosen wallet. The
+    // message will be displayed in the wallet prompt and the network is
+    // explicitly set to Mainnet【8147329001946†L100-L118】.
+    const response = await request('wallet_connect', {
       addresses: ['ordinals', 'payment'],
       message: 'Connect to anarcho‑catbus to launch your runes!',
       network: 'Mainnet',
-    });
-    if (response && response.status === 'success') {
-      const ordinalsItem = response.result.addresses.find(
-        (addr) => addr.purpose === 'ordinals'
-      );
-      const paymentItem = response.result.addresses.find(
-        (addr) => addr.purpose === 'payment'
-      );
-      const ordAddr = ordinalsItem ? ordinalsItem.address : '(no ordinals address)';
-      statusEl.textContent = `Connected to Xverse – ordinals: ${ordAddr}`;
-      button.textContent = 'Connected';
-      // Store addresses on the global object for later use (e.g. minting or voting)
-      window.connectedAddresses = {
-        ordinals: ordinalsItem,
-        payment: paymentItem,
-      };
-    } else {
-      statusEl.textContent = 'Connection rejected or failed. Please try again.';
-      button.disabled = false;
+    }, { providerId });
+    if (!response || response.status !== 'success') {
+      throw new Error(response && response.error && response.error.message ? response.error.message : 'Connection failed');
     }
+    const ordinalsItem = response.result.addresses.find((a) => a.purpose === 'ordinals');
+    const paymentItem = response.result.addresses.find((a) => a.purpose === 'payment');
+    const ordAddr = ordinalsItem ? ordinalsItem.address : '(no ordinals address)';
+    statusEl.textContent = `Connected – ordinals: ${ordAddr}`;
+    button.textContent = 'Connected';
+    // Store addresses globally for subsequent mint/etch operations
+    window.connectedAddresses = {
+      ordinals: ordinalsItem,
+      payment: paymentItem,
+      providerId: providerId,
+    };
   } catch (err) {
-    // Display any error message returned from the wallet
-    statusEl.textContent = err && err.error && err.error.message
-      ? err.error.message
-      : 'Error connecting to wallet';
+    // The selection modal rejects if the user closes it; handle gracefully.
+    console.error(err);
+    const message = (err && err.message) || (err && err.error && err.error.message) || 'Error connecting to wallet';
+    statusEl.textContent = message;
     button.disabled = false;
   }
 }
@@ -145,12 +168,11 @@ document.addEventListener('DOMContentLoaded', () => {
   renderProposals();
   const connectBtn = document.getElementById('connectBtn');
   if (connectBtn) {
-    // When the BYON page is loaded, clicking the connect button will invoke
-    // the Xverse wallet connection flow.
+    // When the BYON page is loaded, clicking the connect button will open
+    // the wallet selector modal. Avoid duplicate connections on subsequent clicks.
     connectBtn.addEventListener('click', () => {
-      // Avoid duplicate connections on subsequent clicks
       if (!connectBtn.disabled) {
-        connectXverse();
+        connectWallet();
       }
     });
   }
