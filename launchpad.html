@@ -67,9 +67,9 @@
   <section class="section-light" id="connect">
     <div class="container">
       <h2>Connect your wallet</h2>
-      <p>To participate in BYON you must prove membership by connecting a compatible wallet. We currently support Xverse. Once connected, a whitelist check will grant access.</p>
+      <p>To participate in BYON you must prove membership by connecting a compatible wallet. Choose from supported wallets like Xverse, Magic Eden, Unisat or Phantom. Once connected, a whitelist check will grant access.</p>
       <div class="wallet-connect">
-        <button id="connectBtn" class="btn btn-primary">Connect Xverse Wallet</button>
+        <button id="connectBtn" class="btn btn-primary">Connect wallet</button>
         <p id="walletStatus" class="status-message">Not connected</p>
       </div>
     </div>
@@ -110,6 +110,68 @@
     </div>
   </section>
 
+  <!-- Mint / Etch Runes Section -->
+  <section class="section-dark" id="mint-etch">
+    <div class="container">
+      <h2>Mint or Etch Runes</h2>
+      <p>Once your proposal is approved you can mint new units of your rune or etch a brand new rune. Please connect your wallet first, then fill out the form below. All parameters are user‑defined so you remain in control.</p>
+      <form id="mintEtchForm" class="submit-form" onsubmit="event.preventDefault(); handleRuneOrder();">
+        <div class="form-group">
+          <label for="runeName">Rune name</label>
+          <input type="text" id="runeName" placeholder="e.g. CATBUS" required />
+        </div>
+        <div class="form-group">
+          <label for="runeAction">Action</label>
+          <select id="runeAction">
+            <option value="mint">Mint</option>
+            <option value="etch">Etch</option>
+          </select>
+        </div>
+        <div id="mintFields" class="conditional-fields">
+          <div class="form-group">
+            <label for="runeRepeats">Number of repeats (mint transactions)</label>
+            <input type="number" id="runeRepeats" min="1" placeholder="1" value="1" />
+          </div>
+          <div class="form-group">
+            <label for="runeFeeRate">Fee rate (sats/vByte)</label>
+            <input type="number" id="runeFeeRate" min="1" placeholder="12" value="12" />
+          </div>
+        </div>
+        <div id="etchFields" class="conditional-fields" style="display:none;">
+          <div class="form-group">
+            <label for="runeDivisibility">Divisibility</label>
+            <input type="number" id="runeDivisibility" min="0" placeholder="0" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="runeSymbol">Symbol (single character)</label>
+            <input type="text" id="runeSymbol" maxlength="1" placeholder="¤" value="¤" />
+          </div>
+          <div class="form-group">
+            <label for="runePremine">Premine amount</label>
+            <input type="text" id="runePremine" placeholder="0" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="runeIsMintable">Is mintable?</label>
+            <select id="runeIsMintable">
+              <option value="true">Yes</option>
+              <option value="false" selected>No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="runeAmount">Mint amount per transaction (if mintable)</label>
+            <input type="text" id="runeAmount" placeholder="1000" />
+          </div>
+          <div class="form-group">
+            <label for="runeCap">Mint cap (if mintable)</label>
+            <input type="text" id="runeCap" placeholder="10" />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Execute</button>
+        <p id="mintEtchStatus" class="status-message"></p>
+      </form>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer class="site-footer">
     <div class="container footer-content">
@@ -123,5 +185,8 @@
   </footer>
 
   <script src="scripts.js"></script>
+  <!-- Load the Sats Connect library to interface with Xverse wallets.  -->
+  <!-- When hosted in production, this script will provide a global `satsConnect` object. -->
+  <script src="https://cdn.jsdelivr.net/npm/@sats-connect/core@latest/dist/index.umd.js"></script>
 </body>
 </html>
