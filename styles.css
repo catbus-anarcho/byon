@@ -529,6 +529,40 @@ body {
   overflow: hidden;
 }
 
+/* Mint / Etch section background */
+#mint-etch.section-dark {
+  position: relative;
+  background-image: url('assets/network.png');
+  background-size: cover;
+  background-position: center;
+  animation: backgroundMoveMint 60s linear infinite;
+  overflow: hidden;
+}
+
+#mint-etch.section-dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+#mint-etch.section-dark .container {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes backgroundMoveMint {
+  0% { background-position: 0 0; }
+  100% { background-position: 1000px 0; }
+}
+
+/* Conditional fields hidden by default; will be toggled via JS */
+.conditional-fields {
+  display: none;
+}
+
 @keyframes backgroundMoveProposals {
   0% { background-position: 0 0; }
   100% { background-position: -1000px 0; }
